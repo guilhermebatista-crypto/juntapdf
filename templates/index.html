@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juntar PDFs</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-center items-center p-6">
+
+    <div class="w-full max-w-xl bg-white border border-slate-200 rounded-lg shadow-sm p-8">
+        
+        <header class="mb-6">
+            <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Juntar Arquivos PDF</h1>
+            <p class="text-sm text-slate-500 mt-1">Selecione múltiplos PDFs para combiná-los em um único documento ordenado.</p>
+        </header>
+
+        <!-- Mensagens de Alerta/Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for category, message in messages %}
+                        <div class="p-3 text-sm rounded border {% if category == 'error' %}bg-rose-50 border-rose-200 text-rose-700{% else %}bg-slate-100 border-slate-300 text-slate-700{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form action="/" method="POST" enctype="multipart/form-data" class="space-y-6">
+            
+            <!-- Área de Upload -->
+            <div>
+                <label for="pdf_files" class="block text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">
+                    Arquivos
+                </label>
+                
+                <div class="flex items-center justify-center w-full">
+                    <label for="pdf_files" class="flex flex-col items-center justify-center w-full h-40 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <svg class="w-8 h-8 mb-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                            <p class="mb-1 text-sm text-slate-600 font-medium">Clique para selecionar os PDFs</p>
+                            <p class="text-xs text-slate-400">Segure Ctrl / Shift para escolher múltiplos</p>
+                        </div>
+                        <input id="pdf_files" name="pdf_files" type="file" class="hidden" accept="application/pdf" multiple required onchange="atualizarListaArquivos(this)">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Lista de Arquivos Selecionados -->
+            <div id="file-list-container" class="hidden">
+                <p class="text-xs font-semibold uppercase text-slate-500 tracking-wider mb-2">Ordem de junção:</p>
+                <ol id="file-list" class="divide-y divide-slate-100 border border-slate-200 rounded text-sm text-slate-700 bg-slate-50 list-decimal list-inside"></ol>
+            </div>
+
+            <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 px-4 rounded transition-colors text-sm">
+                Unificar e Baixar PDF
+            </button>
+        </form>
+
+    </div>
+
+    <script>
+        function atualizarListaArquivos(input) {
+            const container = document.getElementById('file-list-container');
+            const list = document.getElementById('file-list');
+            list.innerHTML = '';
+
+            if (input.files.length > 0) {
+                container.classList.remove('hidden');
+                for (let i = 0; i < input.files.length; i++) {
+                    const li = document.createElement('li');
+                    li.className = 'px-3 py-2 text-slate-600 truncate';
+                    li.textContent = input.files[i].name;
+                    list.appendChild(li);
+                }
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
